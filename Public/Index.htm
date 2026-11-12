@@ -1,0 +1,137 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Two Brain Cells</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #111827;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    h1 {
+      margin-top: 35px;
+    }
+
+    #chat {
+      width: 90%;
+      max-width: 600px;
+      height: 55vh;
+      overflow-y: auto;
+      background: #1f2937;
+      border-radius: 15px;
+      padding: 15px;
+      box-sizing: border-box;
+      margin-top: 20px;
+    }
+
+    .message {
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 12px;
+      overflow-wrap: anywhere;
+    }
+
+    .user {
+      background: #2563eb;
+      text-align: right;
+    }
+
+    .bot {
+      background: #374151;
+    }
+
+    .controls {
+      display: flex;
+      width: 90%;
+      max-width: 600px;
+      gap: 8px;
+      margin-top: 15px;
+    }
+
+    input {
+      flex: 1;
+      min-width: 0;
+      padding: 14px;
+      border-radius: 10px;
+      border: none;
+      font-size: 16px;
+    }
+
+    button {
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #3b82f6;
+      color: white;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🧠 Two Brain Cells</h1>
+  <p>Your personal AI assistant.</p>
+
+  <div id="chat">
+    <div class="message bot">
+      Yo! Welcome to Two Brain Cells. What's up? 😎
+    </div>
+  </div>
+
+  <div class="controls">
+    <input id="message" placeholder="Type something..." />
+    <button onclick="sendMessage()">Send</button>
+  </div>
+
+  <script>
+    async function sendMessage() {
+      const input = document.getElementById("message");
+      const chat = document.getElementById("chat");
+      const message = input.value.trim();
+
+      if (!message) return;
+
+      chat.innerHTML +=
+        `<div class="message user"></div>`;
+
+      chat.lastElementChild.textContent = message;
+      input.value = "";
+
+      try {
+        const response = await fetch("/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message })
+        });
+
+        const data = await response.json();
+
+        const reply = document.createElement("div");
+        reply.className = "message bot";
+        reply.textContent = data.reply || "I couldn't get a response.";
+        chat.appendChild(reply);
+
+      } catch (error) {
+        const reply = document.createElement("div");
+        reply.className = "message bot";
+        reply.textContent = "Couldn't connect to the AI server yet.";
+        chat.appendChild(reply);
+      }
+
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+
+</body>
+</html>
